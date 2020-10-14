@@ -1,4 +1,4 @@
-package gfx;
+package mra.game.gfx;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

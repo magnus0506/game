@@ -1,16 +1,17 @@
 package mra.game;
 
-import gfx.Assets;
-import gfx.Display;
-import gfx.ImageLoader;
-import gfx.SpriteSheet;
+import mra.game.gfx.Assets;
+import mra.game.gfx.Display;
+import mra.game.input.KeyManager;
+import mra.game.states.*;
 
 import java.awt.*;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
 
 public class Game implements Runnable {
 
+    // Variables
     private Display display;
     public int width, height;
     public String title;
@@ -20,19 +21,32 @@ public class Game implements Runnable {
     private BufferStrategy bs;
     private Graphics g;
 
+    //States
+    private State gameState, menuState, settingsState;
+    private KeyManager keyManager;
 
     public Game(String title, int width, int height) {
         this.title = title;
         this.width = width;
         this.height = height;
+        keyManager = new KeyManager();
     }
 
     private void init() {
         display = new Display(title, width, height);
+        display.getFrame().addKeyListener(keyManager);
         Assets.init();
+
+        gameState = new GameState(this);
+        menuState = new MenuState(this);
+        settingsState = new SettingsState(this);
+        StateManager.setState(gameState);
     }
 
     private void tick() {
+        keyManager.tick();
+        if (StateManager.getState() != null)
+            StateManager.getState().tick();
     }
 
     private void render() {
@@ -43,9 +57,10 @@ public class Game implements Runnable {
         }
 
         g = bs.getDrawGraphics();
-        g.clearRect(0,0,width,height);
+        g.clearRect(0, 0, width, height);
 
-        g.drawImage(Assets.player,10,10,null);
+        if (StateManager.getState() != null)
+            StateManager.getState().render(g);
 
         bs.show();
         g.dispose();
@@ -55,12 +70,38 @@ public class Game implements Runnable {
     public void run() {
         init();
 
+        int fps = 60;
+        double timePerTick = 1_000_000_000 / fps;
+        double delta = 0;
+        long now;
+        long lastTime = System.nanoTime();
+        long timer = 0;
+        int ticks = 0;
+
         while (running) {
-            tick();
-            render();
+            now = System.nanoTime();
+            delta += (now - lastTime) / timePerTick;
+            timer += now - lastTime;
+            lastTime = now;
+
+            if (delta >= 1) {
+                tick();
+                render();
+                ticks++;
+                delta--;
+            }
+            if(timer>= 1_000_000_000){
+                System.out.println("Ticks and Frames: " + ticks);
+                ticks = 0;
+                timer = 0;
+            }
         }
 
         stop();
+    }
+
+    public KeyManager getKeyManager(){
+        return keyManager;
     }
 
     public synchronized void start() {
@@ -72,7 +113,7 @@ public class Game implements Runnable {
     }
 
     public synchronized void stop() {
-        if(!running)
+        if (!running)
             return;
         running = false;
         try {
