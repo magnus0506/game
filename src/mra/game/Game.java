@@ -2,6 +2,7 @@ package mra.game;
 
 import mra.game.gfx.Assets;
 import mra.game.gfx.Display;
+import mra.game.gfx.GameCamera;
 import mra.game.input.KeyManager;
 import mra.game.states.*;
 
@@ -11,19 +12,30 @@ import java.awt.image.BufferStrategy;
 
 public class Game implements Runnable {
 
-    // Variables
+    //JFrame variables
     private Display display;
-    public int width, height;
+    private int width, height;
     public String title;
+
+    //Runnable variables
     private boolean running = false;
     private Thread thread;
 
+    //Gfx variables
     private BufferStrategy bs;
     private Graphics g;
 
     //States
     private State gameState, menuState, settingsState;
+
+    //Input
     private KeyManager keyManager;
+
+    //Camera
+    private GameCamera gameCamera;
+
+    //Handler
+    private Handler handler;
 
     public Game(String title, int width, int height) {
         this.title = title;
@@ -37,9 +49,12 @@ public class Game implements Runnable {
         display.getFrame().addKeyListener(keyManager);
         Assets.init();
 
-        gameState = new GameState(this);
-        menuState = new MenuState(this);
-        settingsState = new SettingsState(this);
+        gameCamera = new GameCamera(this,0,0);
+        handler = new Handler(this);
+
+        gameState = new GameState(handler);
+        menuState = new MenuState(handler);
+        settingsState = new SettingsState(handler);
         StateManager.setState(gameState);
     }
 
@@ -102,6 +117,18 @@ public class Game implements Runnable {
 
     public KeyManager getKeyManager(){
         return keyManager;
+    }
+
+    public GameCamera getGameCamera(){
+        return gameCamera;
+    }
+
+    public int getWidth(){
+        return width;
+    }
+
+    public int getHeight(){
+        return height;
     }
 
     public synchronized void start() {
