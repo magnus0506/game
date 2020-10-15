@@ -1,8 +1,8 @@
 package mra.game.entities.creatures;
 
-import mra.game.Game;
 import mra.game.Handler;
 import mra.game.entities.Entity;
+import mra.game.tiles.Tile;
 
 public abstract class Creature extends Entity {
 
@@ -25,8 +25,61 @@ public abstract class Creature extends Entity {
     }
 
     public void move(){
-        x += xMove;
-        y += yMove;
+        moveX();
+        moveY();
+
+    }
+
+    public void moveX(){
+        int tempX;
+        if (xMove > 0){
+            tempX = (int) Math.floor((x + xMove + bounds.x + bounds.width) / Tile.TILE_WIDTH);
+
+            if (collisionWithTile(tempX, (int) Math.floor (y + bounds.y) / Tile.TILE_HEIGHT) &&
+                    collisionWithTile(tempX, (int) Math.floor(y + bounds.y + bounds.height) / Tile.TILE_HEIGHT)){
+                x += xMove;
+            } else {
+                x = tempX * Tile.TILE_WIDTH - bounds.x - bounds.width - 1;
+            }
+
+        } else if (xMove < 0){
+            tempX = (int) Math.floor ((x + xMove + bounds.x) / Tile.TILE_WIDTH);
+
+            if (collisionWithTile(tempX, (int) Math.floor((y + bounds.y) / Tile.TILE_HEIGHT)) &&
+                    collisionWithTile(tempX, (int)Math.floor ((y + bounds.y + bounds.height) / Tile.TILE_HEIGHT))){
+                x += xMove;
+            } else {
+                x = tempX * Tile.TILE_WIDTH + Tile.TILE_WIDTH - bounds.x;
+            }
+        }
+    }
+
+    public void moveY(){
+        int tempY;
+        if (yMove < 0 ){
+            tempY = (int) Math.floor((y + yMove + bounds.y) / Tile.TILE_HEIGHT);
+
+            if (collisionWithTile((int) Math.floor(x + bounds.x) / Tile.TILE_WIDTH, tempY) &&
+                    collisionWithTile((int) Math.floor (x + bounds.x + bounds.width) / Tile.TILE_WIDTH, tempY)){
+                y += yMove;
+            } else{
+                y = tempY * Tile.TILE_HEIGHT + Tile.TILE_HEIGHT - bounds.y;
+            }
+        } else if (yMove > 0){
+            tempY = (int) Math.floor ((y + yMove + bounds.y + bounds.height) / Tile.TILE_HEIGHT);
+
+            if (collisionWithTile((int) Math.floor (x + bounds.x) / Tile.TILE_WIDTH, tempY) &&
+                    collisionWithTile((int) Math.floor (x + bounds.x + bounds.width) / Tile.TILE_WIDTH, tempY)){
+                y += yMove;
+            } else {
+                y = tempY * Tile.TILE_HEIGHT - bounds.y - bounds.height - 1;
+            }
+        }
+    }
+
+
+    protected boolean collisionWithTile(int x, int y){
+        return !handler.getWorld().getTile(x, y).isSolid();
     }
 
     public static int getDefaultHealth() {
