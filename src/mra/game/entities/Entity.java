@@ -1,6 +1,5 @@
 package mra.game.entities;
 
-import mra.game.Game;
 import mra.game.Handler;
 
 import java.awt.*;
@@ -25,6 +24,20 @@ public abstract class Entity {
     public abstract void tick();
 
     public abstract void render(Graphics g);
+
+    public boolean checkEntityCollisions(float xOffset, float yOffset){
+        for (Entity e : handler.getWorld().getEntityManager().getEntities()){
+            if (e.equals(this))
+                continue;
+            if (e.getCollisionBounds(0f,0f).intersects(getCollisionBounds(xOffset, yOffset)))
+                return false;
+        }
+        return true;
+    }
+
+    public Rectangle getCollisionBounds(float xOffset, float yOffset){
+        return new Rectangle((int) (x + bounds.x + xOffset), (int) (y + bounds.y + yOffset), bounds.width, bounds.height);
+    }
 
     public float getX() {
         return x;

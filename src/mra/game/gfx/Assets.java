@@ -5,12 +5,13 @@ import java.awt.image.BufferedImage;
 public class Assets {
 
     public static final int width = 32, height = 32;
-    public static BufferedImage player, dirt, grass, tree, villain;
+    public static BufferedImage dirt, grass, tree, villain;
     public static BufferedImage[] player_down;
     public static BufferedImage[] player_up;
     public static BufferedImage[] player_left;
     public static BufferedImage[] player_right;
     public static BufferedImage[] player_standing;
+    public static BufferedImage[] btn_start;
 
     public static void init(){
         SpriteSheet sheet = new SpriteSheet(ImageLoader.loadImage("/textures/sprite_sheet32.png"));
@@ -37,7 +38,10 @@ public class Assets {
         player_right[0] = sheet.crop(width*4,height*2,width,height);
         player_right[1] = sheet.crop(width*5,height*2,width,height);
 
-        player = sheet.crop(width*3,0,width,height);
+        btn_start = new BufferedImage[2];
+        btn_start[0] = sheet.crop(0,height*2,width*2,height);
+        btn_start[1] = sheet.crop(0,height,width*2,height);
+
         dirt = sheet.crop(0,0,width,height);
         grass = sheet.crop(width,0,width,height);
         tree = sheet.crop(width*2,0,width,height);

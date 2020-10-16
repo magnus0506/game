@@ -2,6 +2,7 @@ package mra.game;
 
 import mra.game.gfx.GameCamera;
 import mra.game.input.KeyManager;
+import mra.game.input.MouseManager;
 import mra.game.worlds.World;
 
 public class Handler {
@@ -23,6 +24,10 @@ public class Handler {
 
     public KeyManager getKeyManager(){
         return game.getKeyManager();
+    }
+
+    public MouseManager getMouseManager(){
+        return game.getMouseManager();
     }
 
     public GameCamera getGameCamera(){
